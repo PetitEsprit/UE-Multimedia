@@ -27,8 +27,6 @@ INT_LINK
 	<w:bookmarkStart w:id="0" w:name="Marque-page_1"/>
 	<w:hyperlink w:anchor="Marque-page_1"><...><w:t>Lien 3</w:t></...></w:hyperlink>
 
-DocXml = rel file + doc file + parsed_data ()
-
 
 link = [doc_name, link_id, link_text, link_target, link_target_mode]
 """
