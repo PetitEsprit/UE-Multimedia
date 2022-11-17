@@ -20,7 +20,7 @@ EXT_LINK
 
 - word/document.xml:
 	<w:hyperlink r:id="..."><...>Lien</...></w:hyperlink>
-	textinstr(file1#id1 -> file2#id2/ ignore don't know it works)
+	textinstr(file1#id1 -> file2#id2/ IGNORE don't know it works)
 
 INT_LINK
 - word/document.xml:
@@ -50,12 +50,23 @@ class DocXmlLink:
 				if r.getAttribute("w:name"):
 					self.links.append([self.name, r.getAttribute("w:id"),"", r.getAttribute("w:name"), "Internal"])
 			anchors = DOMTree.documentElement.getElementsByTagName("w:hyperlink")
+			
+			"""a rechecker si necessaire"""
 			for a in anchors:
+				i = 0
 				for l in self.links:
 					if (l[-1] == "External"  and a.getAttribute("r:id") == l[1]):
 						l[2] = a.getElementsByTagName("w:t")[0].firstChild.nodeValue
 					elif (l[-1] == "Internal" and a.getAttribute("w:anchor") == l[3]):
 						l[2] = a.getElementsByTagName("w:t")[0].firstChild.nodeValue
+						l[1] = "#" + str(i) #l[1]
+						l[3] = "#" + l[3]
+					i = i + 1
+		"""
+		self.anchors = []
+		[self.anchors.append([l[1], l[2]]) for l in self.links]
+		print(self.anchors)
+		"""
 
 def load_docs_in_folder():
 	l = []
@@ -65,21 +76,20 @@ def load_docs_in_folder():
 
 def print_graph(DocxLinkList):
 	graph = "digraph Links {\ncompound=true;\n"
+	
 	for d in DocxLinkList:
-		subgraph = "subgraph \"cluster_" + d.name + "\" {\n"
-		subgraph += "label = \"" + d.name + "\"\n"
-		subgraph += "\"" + d.name + "\"[style=invis]\n"
+		node = "\"" + d.name + "\"\n"
+		"""
 		for a in d.anchors:
 			subgraph += "\"" + d.name + a[0] + "\"[label=\"" + a[1] + "\"]\n"
+		"""
 		for l in d.links:
 			if l[-1] == "Internal":
-				subgraph += "\"" + d.name + l[1] + "\" -> \"" + d.name + l[3] + "\"\n"
-		subgraph += "}\n"
-		graph += subgraph
-	for d in DocxLinkList:
-		for l in d.links:
-			if l[-1] == "External":
-				graph += "\"" + d.name + l[1] + "\" -> \"" + l[3] + "\"[lhead=\"" + d.name + l[1] + "\"]\n"
+				node += "\"" + d.name + "\" -> \"" + d.name + "\""
+			elif l[-1] == "External":
+				node += "\"" + d.name + "\" -> \"" + l[3] + "\""
+			node += "[label=\"" + l[2] + "\"]\n"
+		graph += node
 	graph += "}"
 	print(graph)
 
