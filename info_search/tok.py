@@ -1,7 +1,10 @@
 import json
+import os
 from typing import Dict, List
 
 Doc = Dict
+
+DATABASE_PATH = "./.db"
 
 """class Token:
 	def __init__(self, content, count=1):
@@ -47,6 +50,9 @@ def tokenize(path) -> list:
 	return l
 
 def load_list_token(path, stpwpath) -> Doc:
+	if (os.path.isfile(DATABASE_PATH)):
+		f = open(DATABASE_PATH, "r")
+		return json.loads(f.read())
 	l = tokenize(path)
 	stopwords = load_stopwords(stpwpath)
 	uniq = []
@@ -57,8 +63,10 @@ def load_list_token(path, stpwpath) -> Doc:
 	toks = [{"str": u, "count": l.count(u)} for u in uniq]
 	toks.sort(reverse=True, key=lambda token: token["count"])
 	doc = {"name": path, "words": toks}
+	f = open(DATABASE_PATH, "w")
+	f.write(json.dumps(doc, indent=4))
+	f.close()
 	return doc
-
 
 
 def summary(*argv: Doc):
@@ -69,9 +77,9 @@ def summary(*argv: Doc):
 		for t in arg["words"]:
 			total_count = total_count + t["count"]
 		for t in arg["words"]:
-			print(f'{t["content"]} -  freq: ', "{:.2f}".format(t["count"]/total_count))
+			print(f'{t["str"]} -  freq: ', "{:.2f}".format(t["count"]/total_count))
 
-def get_occur(word: str, *docs: Doc) -> list[tuple[str, int]]:
+def get_occur(word: str, *docs: Doc) -> list:
 	l = []
 	for d in docs:
 		for w in d["words"]:
@@ -83,9 +91,4 @@ def get_occur(word: str, *docs: Doc) -> list[tuple[str, int]]:
 doc = load_list_token("asimov.txt", "stopwords.txt")
 occurs = get_occur("robot", doc)
 print(occurs)
-#print(toks)
-#summary(toks)
-#print(json.dumps(toks, indent=4))
-#print(x.keys())
-#print(load_stopwords("stopwords.txt"))
-#print(str(Token("fefez", 1)))
+summary(doc)
