@@ -5,16 +5,7 @@ from typing import Dict, List
 Doc = Dict
 
 DATABASE_PATH = "./.db"
-
-"""class Token:
-	def __init__(self, content, count=1):
-		self.content = content
-		self.count = count
-	def __str__(self):
-		return f"({self.content}: {self.count})"
-	def __repr__(self):
-   		return self.__str__()
-"""
+STPW_PATH = "./.stopwords.txt"
 
 seps = ['\n', '\t', '\v', '\f', '\r', ' ', #spaces
 		'.', ',',';', ":", '!', '?', #punctuation
@@ -49,25 +40,31 @@ def tokenize(path) -> list:
 	l = [item.strip() for item in l]
 	return l
 
-def load_list_token(path, stpwpath) -> Doc:
+def load_list_token(stpwpath, *path) -> List[Doc]:
 	if (os.path.isfile(DATABASE_PATH)):
 		f = open(DATABASE_PATH, "r")
 		return json.loads(f.read())
-	l = tokenize(path)
 	stopwords = load_stopwords(stpwpath)
-	uniq = []
-	[uniq.append(u) for u in l if u not in uniq if u not in stopwords
-		if len(u) > 2 #additional rule
-	]
-	#toks = [Token(u, l.count(u)) for u in uniq]
-	toks = [{"str": u, "count": l.count(u)} for u in uniq]
-	toks.sort(reverse=True, key=lambda token: token["count"])
-	doc = {"name": path, "words": toks}
+	docs = []
+	for p in path:
+		l = tokenize(p)
+		uniq = []
+		[uniq.append(u) for u in l if u not in uniq if u not in stopwords
+			if len(u) > 2 #additional rule
+		]
+		#toks = [Token(u, l.count(u)) for u in uniq]
+		toks = [{"str": u, "count": l.count(u)} for u in uniq]
+		toks.sort(reverse=True, key=lambda token: token["count"])
+		docs.append({"name": p, "words": toks})
 	f = open(DATABASE_PATH, "w")
-	f.write(json.dumps(doc, indent=4))
+	f.write(json.dumps(docs, indent=4))
 	f.close()
-	return doc
+	return docs
 
+def indexing() -> List[Doc]:
+	path_lst = []
+	path_lst.append("asimov.txt") # to replace by recursive search
+	return load_list_token(STPW_PATH, *path_lst)
 
 def summary(*argv: Doc):
 	#Should take doc or list_doc and print summary
@@ -82,13 +79,14 @@ def summary(*argv: Doc):
 def get_occur(word: str, *docs: Doc) -> list:
 	l = []
 	for d in docs:
+		#print(d["name"])
 		for w in d["words"]:
 			if w["str"] == word:
 				l.append((d["name"], w["count"]))
 	l.sort(reverse=True, key=lambda occur: occur[1])
 	return l
 
-doc = load_list_token("asimov.txt", "stopwords.txt")
-occurs = get_occur("robot", doc)
-print(occurs)
-summary(doc)
+#ldoc = indexing()
+#occurs = get_occur("robot", ldoc)
+#print(occurs)
+#summary(doc)
