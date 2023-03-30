@@ -1,9 +1,8 @@
 from tok import *
 from tkinter import *
 
-def kbevent(event, entry, result_str):
+def kbevent(event, entry, docs, result_str):
 	log = ""
-	docs = indexing()
 	words = entry.get().split()
 	for w in words:
 		occurs = get_occur(w, *docs)
@@ -13,9 +12,10 @@ def kbevent(event, entry, result_str):
 	result_str.set(log)
     
 def run():
+	docs = indexing()
 	window = Tk()
 	window.geometry('600x400')
-	window.bind("<Return>", lambda event: kbevent(event, entry, result_str))
+	window.bind("<Return>", lambda event: kbevent(event, entry, docs, result_str))
 	window.bind("<Escape>", lambda x: window.destroy())
 
 	label = Label(window, text="Info search")
