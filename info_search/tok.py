@@ -51,18 +51,16 @@ def load_list_token(stpwpath, path) -> Doc:
 	toks = [{"str": u, "count": l.count(u)} for u in uniq]
 	toks.sort(reverse=True, key=lambda token: token["count"])
 	doc = {"name": path, "words": toks}
-	print(f"{path} LOADED", file=sys.stderr)
 	return (doc)
 
-def path_search() -> list[str]:
+def path_search(basepath) -> list[str]:
 	paths = []
-	for root, dirs, files in os.walk("."):
+	for root, dirs, files in os.walk(basepath):
 		for name in files:
-
 			paths.append(os.path.join(root, name))
 	return paths
 
-def indexing() -> List[Doc]:
+def indexing(basepath = ".") -> List[Doc]:
 	path_lst = []
 	doc_lst = []
 	if (os.path.isfile(DATABASE_PATH)):
@@ -70,9 +68,14 @@ def indexing() -> List[Doc]:
 		doc_lst = json.loads(f.read())
 		f.close()
 		return doc_lst
-	path_lst = path_search() # to replace by recursive search
+	path_lst = path_search(basepath)
 	for p in path_lst:
-		doc_lst.append(load_list_token(STPW_PATH, p))
+		try:
+			doc = load_list_token(STPW_PATH, p)
+			doc_lst.append(doc)
+			print(f"{p} LOADED", file=sys.stderr)
+		except:
+			print(f"{p} FAILURE LOADING", file=sys.stderr)
 	with open(DATABASE_PATH, "w") as f:
 		f.write(json.dumps(doc_lst, indent=4))
 	return doc_lst
