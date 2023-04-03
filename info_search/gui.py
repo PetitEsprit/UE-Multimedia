@@ -1,6 +1,17 @@
 from tok import *
 from tkinter import *
 
+def showFile(path):
+	file_w = Toplevel()
+	file_w.geometry('400x300')
+	file_w.title(path)
+	text = Text(file_w)
+	with open(path) as f:
+		text.insert(INSERT,  f.read())
+	text.config(state=DISABLED)
+	text.pack(fill="both", expand="yes")
+	file_w.bind("<Escape>", lambda x: file_w.destroy())
+
 def kbevent(event, entry, docs, frame):
 	for l in frame.grid_slaves():
 		l.destroy()
@@ -10,30 +21,26 @@ def kbevent(event, entry, docs, frame):
 		occurs = get_occur(w, *docs)
 		#print("DEBUG: ", occurs)
 		for o in occurs:
-			labelword = Label(frame, text=f"'{w} - ")
-			labelpath = Label(frame, text=f"{o[0]}")
-			labelcount = Label(frame, text=f": {o[1]}")
-			labelword.grid(row=rownb, column=0)
-			labelpath.grid(row=rownb, column=1)
-			labelcount.grid(row=rownb, column=2)
+			Button(frame, text=f"'{w}' - {o[0]} : {o[1]}", relief=FLAT, command=lambda path=o[0]: showFile(path))\
+			.grid(row=rownb, sticky=W)
 			rownb = rownb + 1
     
 def run():
 	docs = indexing()
-	window = Tk()
-	window.geometry('800x600')
-	window.bind("<Return>", lambda event: kbevent(event, entry, docs, labelframe))
-	window.bind("<Escape>", lambda x: window.destroy())
+	root = Tk()
+	root.geometry('800x600')
+	root.bind("<Return>", lambda event: kbevent(event, entry, docs, labelframe))
+	root.bind("<Escape>", lambda x: root.destroy())
 
-	label = Label(window, text="Info search")
+	label = Label(root, text="Info search")
 	label.pack(side=TOP)
 
 	entry_str = StringVar()
 	entry_str.set("Type text to search...")
-	entry = Entry(window, textvariable=entry_str, width=30)
+	entry = Entry(root, textvariable=entry_str, width=30)
 	entry.pack()
 
-	labelframe = LabelFrame(window, text="Results:")
+	labelframe = LabelFrame(root, text="Results:")
 	labelframe.pack(fill="both", expand="yes")
 
-	window.mainloop()
+	root.mainloop()
