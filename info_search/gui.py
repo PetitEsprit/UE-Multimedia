@@ -12,7 +12,7 @@ def showFile(path):
 	text.pack(fill="both", expand="yes")
 	file_w.bind("<Escape>", lambda x: file_w.destroy())
 
-def kbevent(event, entry, docs, frame):
+def search_event(event, entry, docs, frame):
 	for l in frame.grid_slaves():
 		l.destroy()
 	words = entry.get().split()
@@ -28,19 +28,20 @@ def kbevent(event, entry, docs, frame):
 def run():
 	docs = indexing()
 	root = Tk()
+	root.title("Info search")
 	root.geometry('800x600')
-	root.bind("<Return>", lambda event: kbevent(event, entry, docs, labelframe))
+	root.bind("<Return>", lambda event: search_event(event, entry, docs, resultframe))
 	root.bind("<Escape>", lambda x: root.destroy())
 
-	label = Label(root, text="Info search")
-	label.pack(side=TOP)
-
+	resultframe = LabelFrame(root, text="Results:")
+	searchframe = Frame(root)
+	searchframe.pack(side=TOP, pady=50)
 	entry_str = StringVar()
 	entry_str.set("Type text to search...")
-	entry = Entry(root, textvariable=entry_str, width=30)
-	entry.pack()
-
-	labelframe = LabelFrame(root, text="Results:")
-	labelframe.pack(fill="both", expand="yes")
-
+	entry = Entry(searchframe, textvariable=entry_str)
+	entry.pack(side=LEFT)
+	search_ico = PhotoImage(file = r"./res/search_ico.png").subsample(2, 2)
+	Button(searchframe, relief=FLAT, image = search_ico, command=lambda event="<Button-1>": search_event(event, entry, docs, resultframe))\
+		.pack(side=LEFT)
+	resultframe.pack(fill="both", expand="yes")
 	root.mainloop()
