@@ -96,12 +96,12 @@ def get_occur(word: str, *docs: Doc) -> list:
 		#print(d["name"])
 		for w in d["words"]:
 			if w["str"] == word:
-				l.append((d["name"], w["count"]))
+				l.append((w["str"], d["name"], w["count"]))
 	l.sort(reverse=True, key=lambda occur: occur[1])
 	return l
 
 if __name__ == '__main__':
 	ldoc = indexing()
-	#occurs = get_occur("robot", *ldoc)
-	#print(occurs)
-	#summary(doc)
+	occurs = get_occur("robot", *ldoc)
+	print(occurs)
+	#summary(*ldoc)
