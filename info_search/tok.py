@@ -97,6 +97,6 @@ def get_occur(word: str, *docs: Doc) -> list:
 
 if __name__ == '__main__':
 	ldoc = indexing()
-	#occurs = get_occur("robot", *ldoc)
-	#print(occurs)
-	summary(*ldoc)
+	occurs = get_occur("robot", *ldoc)
+	print(occurs)
+	#summary(*ldoc)
