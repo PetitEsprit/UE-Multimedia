@@ -20,8 +20,7 @@ def search_event(event, entry, docs, frame):
 	occurs = []
 	for w in words:
 		occurs.extend(get_occur(w, *docs))
-		print("DEBUG: ", occurs)
-	#frame.configure(text=f"Results: {len(occurs)} found")
+		#print("DEBUG: ", occurs)
 	for o in occurs:
 		Button(frame, text=f"'{o[0]}' - {o[1]} : {o[2]}", relief=FLAT, command=lambda path=o[1]: showFile(path))\
 		.grid(row=rownb, sticky=W)
@@ -29,6 +28,7 @@ def search_event(event, entry, docs, frame):
     
 def run():
 	docs = indexing()
+	summary(*docs)
 	root = Tk()
 	root.title("Info search")
 	root.geometry('800x600')

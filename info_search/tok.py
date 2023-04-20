@@ -8,11 +8,6 @@ Doc = Dict
 DATABASE_PATH = "./.db"
 STPW_PATH = "./.stopwords.txt"
 
-seps = ['\n', '\t', '\v', '\f', '\r', ' ', #spaces
-		'.', ',',';', ":", '!', '?', #punctuation
-		'\'', '\`', '\"'
-	]
-
 def load_stopwords(path) -> list:
 	l = []
 	with open(path) as f:
@@ -29,10 +24,10 @@ def tokenize(path) -> list:
 		txt = f.read()
 	while i < len(txt):
 		#print(txt[i], i)
-		if (start < i and txt[i] in seps):
+		if (start < i and not txt[i].isalnum()):
 			l.append(txt[start:i].lower())
 			start = i = i + 1
-		while (i < len(txt) and txt[i] in seps):
+		while (i < len(txt) and not txt[i].isalnum()):
 			start = i = i + 1
 		i = i + 1
 	if (start < i):
@@ -102,6 +97,6 @@ def get_occur(word: str, *docs: Doc) -> list:
 
 if __name__ == '__main__':
 	ldoc = indexing()
-	occurs = get_occur("robot", *ldoc)
-	print(occurs)
-	#summary(*ldoc)
+	#occurs = get_occur("robot", *ldoc)
+	#print(occurs)
+	summary(*ldoc)
